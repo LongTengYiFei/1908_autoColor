@@ -35,8 +35,12 @@ print(model_cat_auto_color.summary())
 import  some_functions
 model_cat_auto_color.compile(optimizer='RMSprop', loss='mse')
 
+import os
 # 我能不能预先载入模型，继续训练？ 10月14日 17点57分
-model_cat_auto_color.load_weights('.\\cats_auto_color.h5')
+if os.path.exists('.\\cats_auto_color.h5') == True:
+   print('模型文件已存在。')
+   model_cat_auto_color.load_weights('.\\cats_auto_color.h5')
+   print('模型参数载入成功')
 
 train_X_dir = 'D:\\testPicture\\autoColor\\train_X_Data\\'
 train_Y_dir = 'D:\\testPicture\\autoColor\\train_Y_Data\\'
