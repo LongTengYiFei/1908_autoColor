@@ -42,6 +42,8 @@ if os.path.exists('.\\cats_auto_color.h5') == True:
    model_cat_auto_color.load_weights('.\\cats_auto_color.h5')
    print('模型参数载入成功')
 
+# train_X_Data这个文件夹下面必须只有一个子文件夹，里面全都是训练图片
+# train_Y_Data同理
 train_X_dir = 'D:\\testPicture\\autoColor\\train_X_Data\\'
 train_Y_dir = 'D:\\testPicture\\autoColor\\train_Y_Data\\'
 
