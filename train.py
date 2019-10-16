@@ -51,8 +51,7 @@ from keras_preprocessing.image import  ImageDataGenerator
 train_X_dataGen = ImageDataGenerator(rescale=1. / 255)
 train_Y_dataGen = ImageDataGenerator(rescale=1. / 255)
 
-
-batch_size = 20
+batch_size = int(input('batch的大小是多少？输入数字按回车结束：'))
 
 train_X_generator = train_X_dataGen.flow_from_directory(
     train_X_dir,
@@ -96,7 +95,7 @@ def image_X_Y_generator():
 
 # 这里总是报错，说输入层shape不对
 # 注意，第一个参数是一个生成器，别搞错了，要搞细节！！！！
-steps_per_epoch = input('一个时代走几步？输入数字按回车结束输入：')
+steps_per_epoch = input('一个时代走几个batch？输入数字按回车结束输入：')
 epochs = input('走几个时代？输入数字按回车结束输入：')
 history = model_cat_auto_color.fit_generator(
     image_X_Y_generator(),
