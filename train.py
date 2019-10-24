@@ -28,11 +28,11 @@ model_cat_auto_color.add(layers.Conv2D(32, (3, 3), activation='relu', padding='s
 
 # 哈哈，我终于调通了，这一层的深度应该是3才对 2019.10.13————23点31分
 # 其实搞了半天就是因为这里才出错的，应该不是因为generator ---- 2019.10.14————10点14分
-model_cat_auto_color.add(layers.Conv2D(3, (3, 3), activation='tanh', padding='same'))
+# 最后一层双通道含有Lab模式中的ab值 10.23
+model_cat_auto_color.add(layers.Conv2D(2, (3, 3), activation='tanh', padding='same'))
 model_cat_auto_color.add(layers.UpSampling2D((2, 2)))
 print(model_cat_auto_color.summary())
 
-import  some_functions
 model_cat_auto_color.compile(optimizer='RMSprop', loss='mse')
 
 import os
@@ -44,15 +44,19 @@ if os.path.exists('.\\cats_auto_color.h5') == True:
 
 # train_X_Data这个文件夹下面必须只有一个子文件夹，里面全都是训练图片
 # train_Y_Data同理
-train_X_dir = 'D:\\testPicture\\autoColor\\train_X_Data\\'
-train_Y_dir = 'D:\\testPicture\\autoColor\\train_Y_Data\\'
+train_X_dir = 'D:\\testPicture\\autoColor\\x1\\'
+train_Y_dir = 'D:\\testPicture\\autoColor\\y1\\'
 
 from keras_preprocessing.image import  ImageDataGenerator
 train_X_dataGen = ImageDataGenerator(rescale=1. / 255)
 train_Y_dataGen = ImageDataGenerator(rescale=1. / 255)
 
 batch_size = int(input('batch的大小是多少？输入数字按回车结束：'))
-
+"""
+现在主要是解决generator生成黑白图像和彩色不匹配的问题
+不匹配是没办法训练的
+此训练版本为单图训练版，文件夹里只有一张图片10.24
+"""
 train_X_generator = train_X_dataGen.flow_from_directory(
     train_X_dir,
     target_size=(256, 256),
@@ -88,10 +92,22 @@ For example, the last batch of the epoch is commonly smaller than the others.
   只不过第一个值是输入值，是单通道图片
   第二个值是三通道RGB图片
 """
+from skimage.color import rgb2lab
+# 在这里我们考虑将rgb的batch转为lab，但是仅含ab值
 def image_X_Y_generator():
     for batch_x in train_X_generator:
         for batch_y in train_Y_generator:
-            yield (batch_x[0], batch_y[0])
+            """
+            我们先把rgb转lab
+            然后再取lab的后两位值，即ab值
+            参考菜鸟教程，列表的截取
+            """
+            yield (batch_x[0], rgb2lab(batch_y[0])[:,:,:,1:])
+
+"""测试"""
+print(next(image_X_Y_generator())[0][0].shape)
+print(next(image_X_Y_generator())[1][0].shape)
+
 
 # 这里总是报错，说输入层shape不对
 # 注意，第一个参数是一个生成器，别搞错了，要搞细节！！！！
